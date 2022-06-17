@@ -8,23 +8,46 @@ export function List() {
     // Model
     const initialState: Array<iTask> = [];
     const [tasks, setTasks] = useState(initialState);
+    const [loading, setLoading] = useState(false);
 
     // Controller
 
     useEffect(() => {
-        getTasks().then((data) => setTasks(data));
+        setLoading(true);
+        getTasks().then((data) => {
+            setTasks(data);
+            setLoading(false);
+        });
     }, []);
+
+    const handleDelete = (id: number) => {
+        setTasks(tasks.filter((item) => item.id !== id));
+    };
+
+    const handleComplete = (id: number) => {
+        setTasks(
+            tasks.map((item) =>
+                item.id === id
+                    ? { ...item, isCompleted: !item.isCompleted }
+                    : item
+            )
+        );
+    };
 
     return (
         // View
         <>
             <p>List</p>
             <Add></Add>
-            {tasks.length === 0 && <p>Loading</p>}
+            {loading && <p>Loading</p>}
             <ul>
                 {tasks.map((item) => (
                     <li key={item.id}>
-                        <Task></Task>
+                        <Task
+                            task={item}
+                            handleDelete={handleDelete}
+                            handleComplete={handleComplete}
+                        ></Task>
                     </li>
                 ))}
             </ul>
