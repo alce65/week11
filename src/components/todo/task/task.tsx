@@ -7,13 +7,13 @@ export function Task({
 }: {
     task: iTask;
     handleDelete(id: number): void;
-    handleComplete(id: number): void;
+    handleComplete(task: iTask): void;
 }) {
     const handleClick = () => {
-        handleDelete(task.id);
+        handleDelete(task.id as number);
     };
     const handleChange = () => {
-        handleComplete(task.id);
+        handleComplete(task);
     };
     return (
         <>

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { iTask } from '../../../models/task';
-import { getTasks } from '../../../services/mock.api';
+import * as api from '../../../services/http-tasks';
 import { Add } from '../add/add';
 import { Task } from '../task/task';
 
@@ -14,23 +14,32 @@ export function List() {
 
     useEffect(() => {
         setLoading(true);
-        getTasks().then((data) => {
+        api.getAllTasks().then((data) => {
             setTasks(data);
             setLoading(false);
         });
     }, []);
 
-    const handleDelete = (id: number) => {
-        setTasks(tasks.filter((item) => item.id !== id));
+    const handleAdd = (task: iTask) => {
+        // Backend
+        api.addTask(task).then((data) =>
+            // estado
+            setTasks([...tasks, data])
+        );
     };
 
-    const handleComplete = (id: number) => {
-        setTasks(
-            tasks.map((item) =>
-                item.id === id
-                    ? { ...item, isCompleted: !item.isCompleted }
-                    : item
-            )
+    const handleDelete = (id: number) => {
+        api.deleteTask(id).then((resp) => {
+            if (resp.ok) {
+                setTasks(tasks.filter((item) => item.id !== id));
+            }
+        });
+    };
+
+    const handleComplete = (task: iTask) => {
+        task.isCompleted = !task.isCompleted;
+        api.updateTask(task).then((data) =>
+            setTasks(tasks.map((item) => (item.id === task.id ? data : item)))
         );
     };
 
@@ -38,7 +47,7 @@ export function List() {
         // View
         <>
             <p>List</p>
-            <Add></Add>
+            <Add handleAdd={handleAdd}></Add>
             {loading && <p>Loading</p>}
             <ul>
                 {tasks.map((item) => (

@@ -1,17 +1,17 @@
 import { SyntheticEvent, useState } from 'react';
-import { iTask, Task } from '../../../models/task';
+import { iTask } from '../../../models/task';
 
-export function Add() {
+export function Add({ handleAdd }: { handleAdd(task: iTask): void }) {
     const initialState: Partial<iTask> = { title: '', responsible: '' };
     const [formState, setFormState] = useState(initialState);
 
     const handleSubmit = (ev: SyntheticEvent) => {
         ev.preventDefault();
-        const task = new Task(
-            formState.title as string,
-            formState.responsible as string
-        );
-        console.log(task);
+        handleAdd({
+            title: formState.title as string,
+            responsible: formState.responsible as string,
+            isCompleted: false,
+        });
     };
 
     const handleChange = (ev: SyntheticEvent) => {
@@ -27,6 +27,7 @@ export function Add() {
                 value={formState.title}
                 onChange={handleChange}
                 placeholder="Describe la tarea"
+                required
             />
             <input
                 type="text"
@@ -34,6 +35,7 @@ export function Add() {
                 value={formState.responsible}
                 onChange={handleChange}
                 placeholder="Responsable de la tarea"
+                required
             />
             <button type="submit">Guardar</button>
         </form>
